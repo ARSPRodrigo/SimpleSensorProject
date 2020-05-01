@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Accelerometer Sensor Assignment</string>
+    <string name="initial_text">Calculations will appear here once you move the phone</string>
+</resources>
