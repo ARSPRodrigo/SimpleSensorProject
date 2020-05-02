@@ -10,15 +10,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
     private SensorManager sensorManager;
     private TextView view;
-    private double lastUpdate;
     private Map<Double,Double> dataArray;
     private Queue<String> queue;
 
@@ -30,8 +29,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         view = findViewById( R.id.textView );
 
         sensorManager = ( SensorManager ) getSystemService( SENSOR_SERVICE );
-        lastUpdate = System.currentTimeMillis();
-        dataArray = new HashMap<>();
+        System.currentTimeMillis();
+        dataArray = new TreeMap<>();
         queue = new ArrayDeque<>( 10 );
     }
 
@@ -40,20 +39,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     {
         if( event.sensor.getType() == Sensor.TYPE_ACCELEROMETER )
         {
-            getAccelerometer( event );
+            setAccelerometer( event );
         }
 
     }
 
-    private void getAccelerometer( SensorEvent event )
+    private void setAccelerometer( SensorEvent event )
     {
         float[] values = event.values;
         double x = values[0];
         double actualTime = event.timestamp; // time in nano
         if( x > 1 )
         {
+            pollData(); // bound data array to 10 elements
             dataArray.put( actualTime, x );
-            lastUpdate = actualTime;
             if( dataArray.size() > 1 )
             {
                 double totalAcc = 0;
@@ -93,6 +92,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         for( String s : queue )
         {
             view.append( s );
+        }
+    }
+
+    private void pollData()
+    {
+        if( dataArray.size() == 10 )
+        {
+            double key = 0;
+            for( Map.Entry<Double,Double> entry : dataArray.entrySet() )
+            {
+                key = entry.getKey();
+            }
+            dataArray.remove( key );
         }
     }
 
